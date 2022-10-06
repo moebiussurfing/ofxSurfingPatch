@@ -65,28 +65,26 @@ public:
 	ofxPatchbay patchbay;
 
 	// controllers
-	ofParameter<float>pController0{ "pController0", 0, 0, 1 };
-	ofParameter<float>pController1{ "pController1", 0, 0, 1 };
-	ofParameter<float>pController2{ "pController2", 0, 0, 1 };
-	ofParameter<float>pController3{ "pController3", 0, 0, 1 };
-	ofParameterGroup gControllers{ "gControllers" };
+	ofParameter<float>pSrc0{ "pSrc0", 0, 0, 1 };
+	ofParameter<float>pSrc1{ "pSrc1", 0, 0, 1 };
+	ofParameter<float>pSrc2{ "pSrc2", 0, 0, 1 };
+	ofParameter<float>pSrc3{ "pSrc3", 0, 0, 1 };
+	ofParameterGroup gControllers{ "gSources" };
 
 	// targets
-	ofParameter<float>pTarget0{ "pTarget0", 0, 0, 1 };
-	ofParameter<float>pTarget1{ "pTarget1", 0, 0, 1 };
-	ofParameter<float>pTarget2{ "pTarget2", 0, 0, 1 };
-	ofParameter<float>pTarget3{ "pTarget3", 0, 0, 1 };
+	ofParameter<float>pTar0{ "pTar0", 0, 0, 1 };
+	ofParameter<float>pTar1{ "pTar1", 0, 0, 1 };
+	ofParameter<float>pTar2{ "pTar2", 0, 0, 1 };
+	ofParameter<float>pTar3{ "pTar3", 0, 0, 1 };
 	ofParameterGroup gTargets{ "gTargets" };
 
 	// gui
-	ofxPanel guiControllers;
+	ofxPanel guiSources;
 	ofxPanel guiTargets;
 
-	string str2 = "";
+	string strInfo = "\nNO PRESET \n";
 
-	//// scene
-	//ofRectangle rect;
-	//float scale;
-	//ofColor color = ofColor(255, 0, 0);
+	// scene
+	ofColor color = ofColor::white;
 	ofTrueTypeFont font;
 };

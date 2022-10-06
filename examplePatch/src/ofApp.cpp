@@ -16,6 +16,8 @@ void ofApp::setup()
 
 	//--
 
+	// Callbacks
+
 	listener_NewLink = example.bNewLink.newListener([this](bool b)
 		{
 			if (b) {
@@ -37,7 +39,7 @@ void ofApp::setup()
 				}
 
 				if (iController != -1 && iTarget != -1) {
-					string msg = "New Link \t " + ofToString(iController) + " > " + ofToString(iTarget);
+					string msg = "New Link \t\t " + ofToString(iController) + " > " + ofToString(iTarget);
 
 					patchbay.link(iController, iTarget);
 
@@ -106,17 +108,17 @@ void ofApp::updatePatches()
 {
 	patchbay.update();
 
-	guiControllers.setPosition(10, 10);
+	guiSources.setPosition(10, 10);
 	guiTargets.setPosition(ofGetWidth() - 200 - 10, 10);
 }
 
 //--------------------------------------------------------------
 void ofApp::updateGenerators()
 {
-	pController0 = ofxSurfingHelpers::Tick(2.0f);
-	pController1 = ofxSurfingHelpers::Bounce(3.0f);
-	pController2 = ofxSurfingHelpers::Noise(ofPoint(2, -1));
-	pController3 = ofxSurfingHelpers::Bounce(0.5f);
+	pSrc0 = ofxSurfingHelpers::Tick(2.0f);
+	pSrc1 = ofxSurfingHelpers::Bounce(3.0f);
+	pSrc2 = ofxSurfingHelpers::Noise(ofPoint(2, -1));
+	pSrc3 = ofxSurfingHelpers::Bounce(0.5f);
 }
 
 //--------------------------------------------------------------
@@ -125,7 +127,7 @@ void ofApp::drawGui()
 	drawImGui();
 
 	// gui
-	guiControllers.draw();
+	guiSources.draw();
 	guiTargets.draw();
 }
 
@@ -141,16 +143,17 @@ void ofApp::drawImGui()
 		{
 			ImGui::Begin("Panels", &bOpen0, window_flags);
 			{
-				ui.AddToggle("PATCHER", bOpen1, OFX_IM_TOGGLE_ROUNDED_SMALL);
-				ui.AddToggle("SCENE", bScene, OFX_IM_TOGGLE_ROUNDED_SMALL);
+				ui.AddToggle("PATCHER", bOpen1, OFX_IM_TOGGLE_ROUNDED);
+				ui.AddToggle("SCENE", bScene, OFX_IM_TOGGLE_ROUNDED);
+				ui.Add(ui.bLog, OFX_IM_TOGGLE_ROUNDED_SMALL);
 				ui.AddSpacing();
 
 				if (ui.AddButton("Disconnect All"))
 				{
 					patchbay.disconnectAll();
+					ui.AddToLog("Disconnect All \n");
 				}
-				ui.AddToggle("Generators", bGenerators, OFX_IM_TOGGLE_ROUNDED_SMALL);
-				ui.Add(ui.bLog, OFX_IM_TOGGLE_ROUNDED);
+				ui.AddToggle("Generators", bGenerators, OFX_IM_TOGGLE);
 			}
 			ImGui::End();
 		}
@@ -249,8 +252,10 @@ void ofApp::Changed_Params(ofAbstractParameter& e)
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-	if (key == ' ') {
+void ofApp::keyPressed(int key) 
+{
+	if (key == ' ') 
+	{
 		widget.bang();
 	}
 
@@ -261,28 +266,28 @@ void ofApp::keyPressed(int key) {
 void ofApp::setupPatches() {
 
 	// controllers
-	gControllers.add(pController0);
-	gControllers.add(pController1);
-	gControllers.add(pController2);
-	gControllers.add(pController3);
+	gControllers.add(pSrc0);
+	gControllers.add(pSrc1);
+	gControllers.add(pSrc2);
+	gControllers.add(pSrc3);
 
 	// targets
-	gTargets.add(pTarget0);
-	gTargets.add(pTarget1);
-	gTargets.add(pTarget2);
-	gTargets.add(pTarget3);
+	gTargets.add(pTar0);
+	gTargets.add(pTar1);
+	gTargets.add(pTar2);
+	gTargets.add(pTar3);
 
 	// define controllers
-	patchbay.addController(pController0);
-	patchbay.addController(pController1);
-	patchbay.addController(pController2);
-	patchbay.addController(pController3);
+	patchbay.addController(pSrc0);
+	patchbay.addController(pSrc1);
+	patchbay.addController(pSrc2);
+	patchbay.addController(pSrc3);
 
 	// define targets
-	patchbay.addTarget(pTarget0);
-	patchbay.addTarget(pTarget1);
-	patchbay.addTarget(pTarget2);
-	patchbay.addTarget(pTarget3);
+	patchbay.addTarget(pTar0);
+	patchbay.addTarget(pTar1);
+	patchbay.addTarget(pTar2);
+	patchbay.addTarget(pTar3);
 
 	patchbay.setupParameters();
 
@@ -297,18 +302,18 @@ void ofApp::setupPatches() {
 		patchbay.link(2, 2);
 		patchbay.link(3, 3);
 
-		str2 = "PRESET\n";
-		str2 += "0 -> 0\n";
-		str2 += "1 -> 1\n";
-		str2 += "2 -> 2\n";
-		str2 += "3 -> 3\n";
+		strInfo = "PRESET\n";
+		strInfo += "0 -> 0\n";
+		strInfo += "1 -> 1\n";
+		strInfo += "2 -> 2\n";
+		strInfo += "3 -> 3\n";
 	}
 
 	//--
 
 	// gui
-	guiControllers.setup("CONTROLLERS");
-	guiControllers.add(gControllers);
+	guiSources.setup("SOURCES");
+	guiSources.add(gControllers);
 	guiTargets.setup("TARGETS");
 	guiTargets.add(gTargets);
 
@@ -336,11 +341,12 @@ void ofApp::drawScene()
 	// draw scene
 	if (bScene)
 	{
-		widget.setColor(ofColor(ofColor::red, ofMap(pTarget0, 0, 1, 100, 255)));
-		widget.setRadius(ofMap(pTarget1, 0, 1, 100, 500, true));
-		float x = ofMap(pTarget2, 0, 1, 0, ofGetWidth(), true);
-		float y = ofMap(pTarget3, 0, 1, 0, ofGetWidth(), true);
-		int gap = 300;
+		widget.setColor(ofColor(color, ofMap(pTar0, 0, 1, 100, 255)));
+		float r = ofMap(pTar1, 0, 1, 100, 500, true);
+		widget.setRadius(r);
+		float x = ofMap(pTar2, 0, 1, 0, ofGetWidth(), true);
+		float y = ofMap(pTar3, 0, 1, 0, ofGetHeight(), true);
+		int gap = r + 5;
 		x = ofClamp(x, gap, ofGetWidth() - gap);
 		y = ofClamp(y, gap, ofGetHeight() - gap);
 		widget.setPosition(x, y);
@@ -359,9 +365,9 @@ void ofApp::drawScene()
 	ofxSurfingHelpers::drawTextBoxed(font, str1, 20, ofGetHeight() - h - 15);
 
 	// patching preset
-	w = ofxSurfingHelpers::getWidthBBtextBoxed(font, str2);
-	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str2);
-	ofxSurfingHelpers::drawTextBoxed(font, str2, ofGetWidth() - w - 15, ofGetHeight() - h - 15);
+	w = ofxSurfingHelpers::getWidthBBtextBoxed(font, strInfo);
+	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, strInfo);
+	ofxSurfingHelpers::drawTextBoxed(font, strInfo, ofGetWidth() - w - 15, ofGetHeight() - h - 30);
 }
 
 //--------------------------------------------------------------
@@ -369,82 +375,97 @@ void ofApp::keyPressedPatches(int key) {
 
 	// set configurations
 
-	if (key == OF_KEY_RETURN) patchbay.printConnections();
+	if (key == OF_KEY_RETURN) {
+		patchbay.printConnections();
+		
+		ui.AddToLog(patchbay.getConnections());
+	}
 
 	if (key == OF_KEY_BACKSPACE)
 	{
+		color = ofColor::white;
+		
 		patchbay.disconnectAll();
-		str2 = "PRESET\n";
-		str2 += "0    0\n";
-		str2 += "1    1\n";
-		str2 += "2    2\n";
-		str2 += "3    3";
 
-		ui.AddToLog(str2);
+		strInfo = "\nNO PRESET \n";
+		strInfo += "0    0\n";
+		strInfo += "1    1\n";
+		strInfo += "2    2\n";
+		strInfo += "3    3\n";
+
+		ui.AddToLog(strInfo);
 	}
 
 	if (key == '1')
 	{
+		color = ofColor::red;
+
 		patchbay.disconnectAll();
 		patchbay.link(0, 0);
 		patchbay.link(1, 1);
 		patchbay.link(2, 2);
 		patchbay.link(3, 3);
 
-		str2 = "PRESET\n";
-		str2 += "0 -> 0\n";
-		str2 += "1 -> 1\n";
-		str2 += "2 -> 2\n";
-		str2 += "3 -> 3";
+		strInfo = "\nPRESET 1 \n";
+		strInfo += "0 -> 0\n";
+		strInfo += "1 -> 1\n";
+		strInfo += "2 -> 2\n";
+		strInfo += "3 -> 3\n";
 
-		ui.AddToLog(str2);
+		ui.AddToLog(strInfo);
 	}
 	if (key == '2')
 	{
+		color = ofColor::green;
+		
 		patchbay.disconnectAll();
 		patchbay.link(0, 3);
 		patchbay.link(1, 2);
 		patchbay.link(2, 1);
 		patchbay.link(3, 0);
 
-		str2 = "PRESET\n";
-		str2 += "0 -> 3\n";
-		str2 += "1 -> 2\n";
-		str2 += "2 -> 1\n";
-		str2 += "3 -> 0";
+		strInfo = "\nPRESET 2 \n";
+		strInfo += "0 -> 3\n";
+		strInfo += "1 -> 2\n";
+		strInfo += "2 -> 1\n";
+		strInfo += "3 -> 0\n";
 
-		ui.AddToLog(str2);
+		ui.AddToLog(strInfo);
 	}
 	if (key == '3')
 	{
+		color = ofColor::blue;
+		
 		patchbay.disconnectAll();
 		patchbay.link(0, 3);
 		patchbay.link(1, 1);
 		patchbay.link(2, 2);
 		patchbay.link(3, 0);
 
-		str2 = "PRESET\n";
-		str2 += "0 -> 3\n";
-		str2 += "1 -> 1\n";
-		str2 += "2 -> 2\n";
-		str2 += "3 -> 0";
+		strInfo = "\nPRESET 3 \n";
+		strInfo += "0 -> 3\n";
+		strInfo += "1 -> 1\n";
+		strInfo += "2 -> 2\n";
+		strInfo += "3 -> 0\n";
 
-		ui.AddToLog(str2);
+		ui.AddToLog(strInfo);
 	}
 	if (key == '4')
 	{
+		color = ofColor::yellow;
+	
 		patchbay.disconnectAll();
 		patchbay.link(0, 2);
 		patchbay.link(1, 3);
 		patchbay.link(2, 0);
 		patchbay.link(3, 1);
 
-		str2 = "PRESET\n";
-		str2 += "0 -> 2\n";
-		str2 += "1 -> 3\n";
-		str2 += "2 -> 0\n";
-		str2 += "3 -> 1";
+		strInfo = "\nPRESET 4 \n";
+		strInfo += "0 -> 2\n";
+		strInfo += "1 -> 3\n";
+		strInfo += "2 -> 0\n";
+		strInfo += "3 -> 1\n";
 
-		ui.AddToLog(str2);
+		ui.AddToLog(strInfo);
 	}
 }
