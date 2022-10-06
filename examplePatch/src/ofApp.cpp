@@ -1,10 +1,12 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup() 
+void ofApp::setup()
 {
 	ofSetFrameRate(60);
 	ofSetWindowPosition(-1920, 25);
+
+	font.loadFont(FONT_PATH_DEFAULT_LEGACY, 10);
 
 	ofxSurfingHelpers::setThemeDark_ofxGui();
 
@@ -93,7 +95,7 @@ void ofApp::setup()
 }
 
 //--------------------------------------------------------------
-void ofApp::update() 
+void ofApp::update()
 {
 	updatePatches();
 	if (bGenerators) updateGenerators();
@@ -118,22 +120,29 @@ void ofApp::updateGenerators()
 }
 
 //--------------------------------------------------------------
-void ofApp::draw()
+void ofApp::drawGui()
 {
-	drawPatches();
+	drawImGui();
 
-	//--
+	// gui
+	guiControllers.draw();
+	guiTargets.draw();
+}
 
+//--------------------------------------------------------------
+void ofApp::drawImGui()
+{
 	ui.Begin();
 	{
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
 		if (ui.bAutoResize) window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
-		if (bOpen0) {
+		if (bOpen0)
+		{
 			ImGui::Begin("Panels", &bOpen0, window_flags);
 			{
-				ui.AddToggle("Show 1", bOpen1, OFX_IM_TOGGLE_ROUNDED_SMALL);
-				ui.AddToggle("Show 2", bOpen2, OFX_IM_TOGGLE_ROUNDED_SMALL);
+				ui.AddToggle("PATCHER", bOpen1, OFX_IM_TOGGLE_ROUNDED_SMALL);
+				ui.AddToggle("SCENE", bScene, OFX_IM_TOGGLE_ROUNDED_SMALL);
 				ui.AddSpacing();
 
 				if (ui.AddButton("Disconnect All"))
@@ -151,7 +160,7 @@ void ofApp::draw()
 		if (bOpen1) drawWidgets();
 
 		/*
-		if (ui.bLog) 
+		if (ui.bLog)
 		{
 			ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
@@ -159,6 +168,16 @@ void ofApp::draw()
 		*/
 	}
 	ui.End();
+}
+
+//--------------------------------------------------------------
+void ofApp::draw()
+{
+	drawScene();
+
+	//--
+
+	drawGui();
 }
 
 //--------------------------------------------------------------
@@ -218,10 +237,11 @@ void ofApp::exit()
 void ofApp::Changed_Params(ofAbstractParameter& e)
 {
 	string name = e.getName();
-	ofLogNotice() << "Changed parameter named: " << name << " : with value " << e;
+	ofLogVerbose() << "Changed parameter named: " << name << " : with value " << e;
 
 	string msg = ofToString(name) + " : " + ofToString(e);
-	ui.AddToLog(msg);
+
+	//ui.AddToLog(msg);
 
 	//if (name == SHOW_gui.getName())
 	//{
@@ -230,7 +250,9 @@ void ofApp::Changed_Params(ofAbstractParameter& e)
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	if (key = ' ') {}
+	if (key == ' ') {
+		widget.bang();
+	}
 
 	keyPressedPatches(key);
 }
@@ -279,54 +301,67 @@ void ofApp::setupPatches() {
 		str2 += "0 -> 0\n";
 		str2 += "1 -> 1\n";
 		str2 += "2 -> 2\n";
-		str2 += "3 -> 3";
+		str2 += "3 -> 3\n";
 	}
 
 	//--
 
 	// gui
-	guiControllers.setup();
+	guiControllers.setup("CONTROLLERS");
 	guiControllers.add(gControllers);
-	guiTargets.setup();
+	guiTargets.setup("TARGETS");
 	guiTargets.add(gTargets);
 
-	rect = ofRectangle(0, 0, 100, 100);
+	//rect = ofRectangle(0, 0, 100, 100);
 
 	//--
 
 	params.add(gControllers);
 	//params.add(gTargets);
+	//--
+
+	// widget
+	//widget.setName("Patcher");
+	widget.setEnableBorder(false);
+	widget.setDraggable(false);
+	widget.setToggleMode(true);
+	widget.toggle(true);
 }
 
 //--------------------------------------------------------------
-void ofApp::drawPatches() 
+void ofApp::drawScene()
 {
+	ofBackground(128);
+
 	// draw scene
+	if (bScene)
 	{
-		ofPushMatrix();
-		ofTranslate(ofGetWidth() / 2 * pTarget0, ofGetHeight() / 2 * pTarget1);
-		scale = pTarget2;
-		ofBackground(32);
-		ofSetColor(color.r, color.g, color.b, 255 * pTarget3);
-		ofDrawRectangle(rect.x - scale * rect.width / 2, rect.y - scale * rect.height, scale * rect.width, scale * rect.height);
-		ofPopMatrix();
+		widget.setColor(ofColor(ofColor::red, ofMap(pTarget0, 0, 1, 100, 255)));
+		widget.setRadius(ofMap(pTarget1, 0, 1, 100, 500, true));
+		float x = ofMap(pTarget2, 0, 1, 0, ofGetWidth(), true);
+		float y = ofMap(pTarget3, 0, 1, 0, ofGetWidth(), true);
+		int gap = 300;
+		x = ofClamp(x, gap, ofGetWidth() - gap);
+		y = ofClamp(y, gap, ofGetHeight() - gap);
+		widget.setPosition(x, y);
+		widget.draw();
 	}
 
 	//--
 
-	// help
+	// help info
 	string str1 = "";
+	int w, h;
 	str1 += "RETURN       : PRINT CONNECTIONS\n";
 	str1 += "BACKSPACE    : DISCONNECT ALL\n";
 	str1 += "KEYS 1-2-3-4 : PATCHBAY LINKS PRESETS";
-	ofDrawBitmapStringHighlight(str1, 20, ofGetHeight() - 100);
+	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str1);
+	ofxSurfingHelpers::drawTextBoxed(font, str1, 20, ofGetHeight() - h - 15);
 
 	// patching preset
-	ofDrawBitmapStringHighlight(str2, ofGetWidth() - 70, ofGetHeight() - 100);
-
-	// gui
-	guiControllers.draw();
-	guiTargets.draw();
+	w = ofxSurfingHelpers::getWidthBBtextBoxed(font, str2);
+	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str2);
+	ofxSurfingHelpers::drawTextBoxed(font, str2, ofGetWidth() - w - 15, ofGetHeight() - h - 15);
 }
 
 //--------------------------------------------------------------
@@ -344,6 +379,7 @@ void ofApp::keyPressedPatches(int key) {
 		str2 += "1    1\n";
 		str2 += "2    2\n";
 		str2 += "3    3";
+
 		ui.AddToLog(str2);
 	}
 
@@ -360,6 +396,7 @@ void ofApp::keyPressedPatches(int key) {
 		str2 += "1 -> 1\n";
 		str2 += "2 -> 2\n";
 		str2 += "3 -> 3";
+
 		ui.AddToLog(str2);
 	}
 	if (key == '2')
@@ -375,6 +412,7 @@ void ofApp::keyPressedPatches(int key) {
 		str2 += "1 -> 2\n";
 		str2 += "2 -> 1\n";
 		str2 += "3 -> 0";
+
 		ui.AddToLog(str2);
 	}
 	if (key == '3')
@@ -390,6 +428,7 @@ void ofApp::keyPressedPatches(int key) {
 		str2 += "1 -> 1\n";
 		str2 += "2 -> 2\n";
 		str2 += "3 -> 0";
+
 		ui.AddToLog(str2);
 	}
 	if (key == '4')
@@ -405,6 +444,7 @@ void ofApp::keyPressedPatches(int key) {
 		str2 += "1 -> 3\n";
 		str2 += "2 -> 0\n";
 		str2 += "3 -> 1";
+
 		ui.AddToLog(str2);
 	}
 }

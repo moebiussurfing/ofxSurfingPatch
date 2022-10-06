@@ -9,6 +9,7 @@
 
 #include "ofxPatchbay.h"
 #include "ofxGui.h"
+#include "CircleBeat.h"
 
 /*
 
@@ -18,26 +19,32 @@
 */
 
 
-class ofApp : public ofBaseApp {
-
+class ofApp : public ofBaseApp 
+{
 
 public:
+
 	void setup();
 	void update();
 	void updateGenerators();
 	void draw();
 	void exit();
 	void keyPressed(int key);
+	
+	void drawGui();
+	void drawImGui();
 
 	ofxSurfingGui ui;
 	
 	Example example;
 
 	void drawWidgets();
+	
+	CircleBeat widget;
 
 	bool bOpen0 = true;
 	bool bOpen1 = true;
-	bool bOpen2 = false;
+	bool bScene = true;
 	bool bGenerators = true;
 
 	bool initialized = false;
@@ -52,7 +59,7 @@ public:
 	
 	void setupPatches();
 	void updatePatches();
-	void drawPatches();
+	void drawScene();
 	void keyPressedPatches(int key);
 
 	ofxPatchbay patchbay;
@@ -77,9 +84,9 @@ public:
 
 	string str2 = "";
 
-	// scene
-	ofRectangle rect;
-	float scale;
-	ofColor color = ofColor(255, 0, 0);
-
+	//// scene
+	//ofRectangle rect;
+	//float scale;
+	//ofColor color = ofColor(255, 0, 0);
+	ofTrueTypeFont font;
 };
