@@ -17,36 +17,59 @@ void ofApp::setup()
 	//--
 
 	// Callbacks
+	setupCallbacks();
 
-	listener_NewLink = example.bNewLink.newListener([this](bool b)
+}
+
+//--------------------------------------------------------------
+void ofApp::startup()
+{
+	load(path);
+}
+
+//--------------------------------------------------------------
+void ofApp::setupCallbacks()
+{
+	//TODO: workaround
+	// modified patch links into the ImGui node editor,
+	// are reflected here!
+
+	//--
+	// 
+	// CREATE LINK
+
+	listener_NewLink = patcher.bNewLink.newListener([this](bool b)
 		{
 			if (b) {
 				b = false;
 
-				string msg = "New Link \t " + ofToString(example.lastPinFrom) + " > " + ofToString(example.lastPinTo);
+				//string msg = "New Link \t " + ofToString(patcher.lastPinFrom) + " > " + ofToString(patcher.lastPinTo);
 
-				int iController = -1;
-				int iTarget = -1;
+				int iSrc = -1;
+				int iTar = -1;
 
+				//TODO: WIP
 				// workaround hardcoded for 4 to 4 elements
-				if (example.lastPinFrom >= 2 && example.lastPinFrom <= 5)
+				if (patcher.lastPinFrom >= 2 && patcher.lastPinFrom <= 5)
 				{
-					iController = example.lastPinFrom - 2;
+					iSrc = patcher.lastPinFrom - 2;
 				}
-				if (example.lastPinTo >= 7 && example.lastPinTo <= 10)
+				if (patcher.lastPinTo >= 7 && patcher.lastPinTo <= 10)
 				{
-					iTarget = example.lastPinTo - 7;
+					iTar = patcher.lastPinTo - 7;
 				}
 
-				if (iController != -1 && iTarget != -1) {
-					string msg = "New Link \t\t " + ofToString(iController) + " > " + ofToString(iTarget);
+				if (iSrc != -1 && iTar != -1)
+				{
+					patchbay.link(iSrc, iTar);
+					linkToJson(iSrc, iTar);
 
-					patchbay.link(iController, iTarget);
-
+					string msg = "New Link \t\t " + ofToString(iSrc) + " > " + ofToString(iTar);
 					ui.AddToLog(msg);
 					ofLogNotice(__FUNCTION__) << msg;
 				}
-				else {
+				else
+				{
 					ui.AddToLog("Out of range. Link invalid");
 					ofLogError(__FUNCTION__) << "Out of range. Link invalid";
 				}
@@ -54,51 +77,119 @@ void ofApp::setup()
 		});
 
 	//--
-
-	listener_RemovedLink = example.bRemovedLink.newListener([this](bool b)
+	
+	//TODO: WIP notice that only one link can be deleted at time,
+	//or jsno will be broken...
+	 
+	// REMOVE LINK
+	
+	listener_RemovedLink = patcher.bRemovedLink.newListener([this](bool b)
 		{
 			if (b) {
 				b = false;
 
-				string msg = "Removed Link \t " + ofToString(example.lastPinFrom) + " > " + ofToString(example.lastPinTo);
+				//string msg = "Removed Link \t " + ofToString(patcher.lastPinFrom) + " > " + ofToString(patcher.lastPinTo);
 
-				int iController = -1;
-				int iTarget = -1;
+				int iSrc = -1;
+				int iTar = -1;
 
 				// workaround hardcoded for 4 to 4 elements
-				if (example.lastPinFrom >= 2 && example.lastPinFrom <= 5)
+				if (patcher.lastPinFrom >= 2 && patcher.lastPinFrom <= 5)
 				{
-					iController = example.lastPinFrom - 2;
-				}
-				if (example.lastPinTo >= 7 && example.lastPinTo <= 10)
-				{
-					iTarget = example.lastPinTo - 7;
+					iSrc = patcher.lastPinFrom - 2;
 				}
 
-				if (iController != -1 && iTarget != -1) {
-					string msg = "Removed Link \t " + ofToString(iController) + " > " + ofToString(iTarget);
+				if (patcher.lastPinTo >= 7 && patcher.lastPinTo <= 10)
+				{
+					iTar = patcher.lastPinTo - 7;
+				}
 
-					patchbay.unlink(iController, iTarget);
+				if (iSrc != -1 && iTar != -1)
+				{
+					patchbay.unlink(iSrc, iTar);
+					unlinkFromJson(iSrc, iTar);
 
+					string msg = "Removed Link \t " + ofToString(iSrc) + " > " + ofToString(iTar);
 					ui.AddToLog(msg);
 					ofLogNotice(__FUNCTION__) << msg;
 				}
-				else {
+				else
+				{
 					ui.AddToLog("Out of range. Link invalid");
 					ofLogError(__FUNCTION__) << "Out of range. Link invalid";
 				}
 			}
 		});
+}
 
-	//--
+//--------------------------------------------------------------
+void ofApp::unlinkFromJson(int i, int o)
+{
+	int n = -1;
+	int _n = 0;
+	for (auto& j : js)
+	{
+		if (!j.empty())
+		{
+			int _i = j["source"];
+			int _o = j["target"];
+			if (i == _i && o == _o) //same link
+			{
+				n = _n;
+			}
+			_n++;
+		}
+	}
 
-	ofAddListener(params.parameterChangedE(), this, &ofApp::Changed_Params); // setup()
+	if (n != -1) {
+		js.erase(n);
+	}
+}
 
+//--------------------------------------------------------------
+void ofApp::linkToJson(int i, int o)
+{
+	ofJson j;
+	j["source"] = i;
+	j["target"] = o;
+	js.push_back(j);
+}
+
+//--------------------------------------------------------------
+void ofApp::load(string path)
+{
+	ofFile file(path);
+	if (file.exists())
+	{
+		file >> js;
+
+		patchbay.disconnectAll();
+		patcher.clearLinks();
+
+		for (auto& j : js) {
+			if (!j.empty())
+			{
+				int i = j["source"];
+				int o = j["target"];
+
+				patchbay.link(i, o);
+				patcher.link(i, o);
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::save(string path)
+{
+	ofSavePrettyJson(path, js);
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	if (ofGetFrameNum() == 10) startup();
+
 	updatePatches();
 	if (bGenerators) updateGenerators();
 }
@@ -108,8 +199,14 @@ void ofApp::updatePatches()
 {
 	patchbay.update();
 
-	guiSources.setPosition(10, 10);
-	guiTargets.setPosition(ofGetWidth() - 200 - 10, 10);
+	int pad = 15;
+	int h;
+	int w;
+	h = guiSources.getHeight();
+	guiSources.setPosition(pad, ofGetHeight() / 2 - h / 2);
+	h = guiTargets.getHeight();
+	w = guiTargets.getWidth();
+	guiTargets.setPosition(ofGetWidth() - w - pad, ofGetHeight() / 2 - h / 2);
 }
 
 //--------------------------------------------------------------
@@ -151,6 +248,9 @@ void ofApp::drawImGui()
 				if (ui.AddButton("Disconnect All"))
 				{
 					patchbay.disconnectAll();
+					patcher.clearLinks();
+					js.clear();
+
 					ui.AddToLog("Disconnect All \n");
 				}
 				ui.Add(bGenerators, OFX_IM_TOGGLE_BORDER_BLINK);
@@ -180,12 +280,7 @@ void ofApp::drawPatcher()
 
 	if (!initialized) {
 		initialized = true;
-
-		//// simple-example
-		//g_Context = ed::CreateEditor();
-
-		// basic-interaction-example
-		example.Application_Initialize();
+		patcher.OnSetup();
 	}
 
 	/*
@@ -200,27 +295,7 @@ void ofApp::drawPatcher()
 	window_flags = ImGuiWindowFlags_None;
 	if (ui.BeginWindow(bGui_Patcher, window_flags))
 	{
-		//// simple-example
-		//{
-		//	ed::SetCurrentEditor(g_Context);
-		//	ed::Begin("My Editor");
-		//	int uniqueId = 1;
-		//	// Start drawing nodes.
-		//	ed::BeginNode(uniqueId++);
-		//	ImGui::Text("Node A");
-		//	ed::BeginPin(uniqueId++, ed::PinKind::Input);
-		//	ImGui::Text("-> In");
-		//	ed::EndPin();
-		//	ImGui::SameLine();
-		//	ed::BeginPin(uniqueId++, ed::PinKind::Output);
-		//	ImGui::Text("Out ->");
-		//	ed::EndPin();
-		//	ed::EndNode();
-		//	ed::End();
-		//}
-
-		// basic-interaction-example
-		example.Application_Frame();
+		patcher.OnDraw();
 
 		ui.EndWindow();
 	}
@@ -231,14 +306,12 @@ void ofApp::exit()
 {
 	ofRemoveListener(params.parameterChangedE(), this, &ofApp::Changed_Params); // exit()
 
-	//// simple-example
-	//ed::DestroyEditor(g_Context);
+	patcher.OnExit();
 
-	// basic-interaction-example
-	example.Application_Finalize();
+	save(path);
 }
 
-// callback for a parameter group  
+// Callback 
 //--------------------------------------------------------------
 void ofApp::Changed_Params(ofAbstractParameter& e)
 {
@@ -249,20 +322,9 @@ void ofApp::Changed_Params(ofAbstractParameter& e)
 
 	//ui.AddToLog(msg);
 
-	//if (name == SHOW_gui.getName())
+	//if (name == .getName())
 	//{
 	//}
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key)
-{
-	if (key == ' ')
-	{
-		widget.bang();
-	}
-
-	keyPressedPatches(key);
 }
 
 //--------------------------------------------------------------
@@ -305,7 +367,7 @@ void ofApp::setupPatches() {
 		patchbay.link(2, 2);
 		patchbay.link(3, 3);
 
-		strInfo = "PRESET\n";
+		strInfo = "PRESET \n";
 		strInfo += "0 -> 0\n";
 		strInfo += "1 -> 1\n";
 		strInfo += "2 -> 2\n";
@@ -320,20 +382,25 @@ void ofApp::setupPatches() {
 	guiTargets.setup("TARGETS");
 	guiTargets.add(gTargets);
 
-	//rect = ofRectangle(0, 0, 100, 100);
-
 	//--
 
 	params.add(gControllers);
 	//params.add(gTargets);
+
+	//--
+
+	ofAddListener(params.parameterChangedE(), this, &ofApp::Changed_Params);
+
 	//--
 
 	// widget
-	//widget.setName("Patcher");
-	widget.setEnableBorder(false);
-	widget.setDraggable(false);
-	widget.setToggleMode(true);
-	widget.toggle(true);
+	{
+		//widget.setName("Patcher");
+		widget.setEnableBorder(false);
+		widget.setDraggable(false);
+		widget.setToggleMode(true);
+		widget.toggle(true);
+	}
 }
 
 //--------------------------------------------------------------
@@ -374,6 +441,39 @@ void ofApp::drawScene()
 }
 
 //--------------------------------------------------------------
+void ofApp::keyPressed(int key)
+{
+	/*
+	if (key == ' ')
+	{
+		widget.bang();
+	}
+	*/
+
+	/*
+	if (key == 'a')
+	{
+		patcher.link(2, 7); // 1 -> 1
+	}
+	if (key == 's')
+	{
+		patcher.link(2, 10);
+	}
+	if (key == 'd')
+	{
+		patcher.link(5, 7);
+	}
+	*/
+
+	if (key == OF_KEY_F1)
+	{
+		ui.AddToLog(patcher.getListLinks());
+	}
+
+	keyPressedPatches(key);
+}
+
+//--------------------------------------------------------------
 void ofApp::keyPressedPatches(int key) {
 
 	// set configurations
@@ -384,11 +484,14 @@ void ofApp::keyPressedPatches(int key) {
 		ui.AddToLog(patchbay.getConnections());
 	}
 
+	// Disconnect all
 	if (key == OF_KEY_BACKSPACE)
 	{
 		color = ofColor::white;
 
 		patchbay.disconnectAll();
+		patcher.clearLinks();
+		js.clear();
 
 		strInfo = "\nNO PRESET \n";
 		strInfo += "0    0\n";
@@ -409,6 +512,18 @@ void ofApp::keyPressedPatches(int key) {
 		patchbay.link(2, 2);
 		patchbay.link(3, 3);
 
+		patcher.clearLinks();
+		patcher.link(0, 0);
+		patcher.link(1, 1);
+		patcher.link(2, 2);
+		patcher.link(3, 3);
+
+		js.clear();
+		linkToJson(0, 0);
+		linkToJson(1, 1);
+		linkToJson(2, 2);
+		linkToJson(3, 3);
+
 		strInfo = "\nPRESET 1 \n";
 		strInfo += "0 -> 0\n";
 		strInfo += "1 -> 1\n";
@@ -417,6 +532,7 @@ void ofApp::keyPressedPatches(int key) {
 
 		ui.AddToLog(strInfo);
 	}
+
 	if (key == '2')
 	{
 		color = ofColor::green;
@@ -427,6 +543,18 @@ void ofApp::keyPressedPatches(int key) {
 		patchbay.link(2, 1);
 		patchbay.link(3, 0);
 
+		patcher.clearLinks();
+		patcher.link(0, 3);
+		patcher.link(1, 2);
+		patcher.link(2, 1);
+		patcher.link(3, 0);
+
+		js.clear();
+		linkToJson(0, 3);
+		linkToJson(1, 2);
+		linkToJson(2, 1);
+		linkToJson(3, 0);
+
 		strInfo = "\nPRESET 2 \n";
 		strInfo += "0 -> 3\n";
 		strInfo += "1 -> 2\n";
@@ -435,6 +563,7 @@ void ofApp::keyPressedPatches(int key) {
 
 		ui.AddToLog(strInfo);
 	}
+
 	if (key == '3')
 	{
 		color = ofColor::blue;
@@ -445,6 +574,18 @@ void ofApp::keyPressedPatches(int key) {
 		patchbay.link(2, 2);
 		patchbay.link(3, 0);
 
+		patcher.clearLinks();
+		patcher.link(0, 3);
+		patcher.link(1, 1);
+		patcher.link(2, 2);
+		patcher.link(3, 0);
+
+		js.clear();
+		linkToJson(0, 3);
+		linkToJson(1, 1);
+		linkToJson(2, 2);
+		linkToJson(3, 0);
+
 		strInfo = "\nPRESET 3 \n";
 		strInfo += "0 -> 3\n";
 		strInfo += "1 -> 1\n";
@@ -453,6 +594,7 @@ void ofApp::keyPressedPatches(int key) {
 
 		ui.AddToLog(strInfo);
 	}
+
 	if (key == '4')
 	{
 		color = ofColor::yellow;
@@ -462,6 +604,18 @@ void ofApp::keyPressedPatches(int key) {
 		patchbay.link(1, 3);
 		patchbay.link(2, 0);
 		patchbay.link(3, 1);
+
+		patcher.clearLinks();
+		patcher.link(0, 2);
+		patcher.link(1, 3);
+		patcher.link(2, 0);
+		patcher.link(3, 1);
+
+		js.clear();
+		linkToJson(0, 2);
+		linkToJson(1, 3);
+		linkToJson(2, 0);
+		linkToJson(3, 1);
 
 		strInfo = "\nPRESET 4 \n";
 		strInfo += "0 -> 2\n";
