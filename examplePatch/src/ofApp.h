@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 
-#include "ofxSurfingPatch.h" // -> here is the patching code
+#include "ofxSurfingPatch.h"
 #include "ofxPatchbay.h"
 
 #include "ofxSurfingImGui.h"	
@@ -17,7 +17,6 @@
 	+ presets
 */
 
-
 class ofApp : public ofBaseApp
 {
 
@@ -25,13 +24,13 @@ public:
 
 	void setup();
 	void startup();
-	void setupCallbacks();
 	void update();
-	void updateGenerators();
 	void draw();
 	void exit();
 	void keyPressed(int key);
 
+	void setupCallbacks();
+	void updateGenerators();
 	void drawGui();
 	void drawImGui();
 
@@ -94,7 +93,7 @@ public:
 
 	string strInfo = "\nNO PRESET \n";
 
-	// Serialization
+	// Patching Serialization
 	string path = "patching.json";
 	ofJson js;
 	void load(string path);

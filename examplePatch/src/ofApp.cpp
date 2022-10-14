@@ -370,6 +370,7 @@ void ofApp::setupPatches() {
 	patchbay.addTarget(pTar2);
 	patchbay.addTarget(pTar3);
 
+	// register
 	patchbay.setupParameters();
 
 	//--
