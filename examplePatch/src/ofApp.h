@@ -41,9 +41,6 @@ public:
 	ofParameter<bool> bScene{ "Scene",true };
 	ofParameter<bool> bGenerators{ "Generators",true };
 
-	void Changed_Params(ofAbstractParameter& e);
-	ofParameterGroup params{ "Params" };
-
 	void drawScene();
 	CircleBeat widget;
 

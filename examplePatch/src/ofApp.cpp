@@ -312,27 +312,9 @@ void ofApp::drawPatcher()
 //--------------------------------------------------------------
 void ofApp::exit()
 {
-	ofRemoveListener(params.parameterChangedE(), this, &ofApp::Changed_Params); // exit()
-
 	patcher.OnExit();
 
 	save(path);
-}
-
-// Callback 
-//--------------------------------------------------------------
-void ofApp::Changed_Params(ofAbstractParameter& e)
-{
-	string name = e.getName();
-	ofLogVerbose() << "Changed parameter named: " << name << " : with value " << e;
-
-	string msg = ofToString(name) + " : " + ofToString(e);
-
-	//ui.AddToLog(msg);
-
-	//if (name == .getName())
-	//{
-	//}
 }
 
 //--------------------------------------------------------------
@@ -401,15 +383,6 @@ void ofApp::setupPatches() {
 
 	//--
 
-	// callbacks
-
-	params.add(gControllers);
-	//params.add(gTargets);
-
-	ofAddListener(params.parameterChangedE(), this, &ofApp::Changed_Params);
-
-	//--
-
 	// Scene Widget
 	{
 		widget.setEnableBorder(false);
@@ -421,67 +394,8 @@ void ofApp::setupPatches() {
 }
 
 //--------------------------------------------------------------
-void ofApp::drawScene()
-{
-	ofBackground(128);
-
-	// Scene Widget
-	if (bScene)
-	{
-		int g = 300;
-		float r = ofMap(pTar1, 0, 1, 100, 500, true);
-		widget.setRadius(r);
-		widget.setColor(ofColor(color, ofMap(pTar0, 0, 1, 100, 255)));
-		float x = ofMap(pTar2, 0, 1, -g, g, true);
-		float y = ofMap(pTar3, 0, 1, -g, g, true);
-		ofPushMatrix();
-		ofTranslate(x, y);
-		widget.draw();
-		ofPopMatrix();
-	}
-
-	//--
-
-	// help info
-	string str1 = "";
-	int w, h;
-	str1 += "RETURN       : PRINT CONNECTIONS\n";
-	str1 += "BACKSPACE    : DISCONNECT ALL\n";
-	str1 += "KEYS 1-2-3-4 : PATCHBAY LINKS PRESETS";
-	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str1);
-	ofxSurfingHelpers::drawTextBoxed(font, str1, 20, ofGetHeight() - h - 15);
-
-	// patching preset
-	w = ofxSurfingHelpers::getWidthBBtextBoxed(font, strInfo);
-	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, strInfo);
-	ofxSurfingHelpers::drawTextBoxed(font, strInfo, ofGetWidth() - w - 15, ofGetHeight() - h - 30);
-}
-
-//--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	/*
-	if (key == ' ')
-	{
-		widget.bang();
-	}
-	*/
-
-	/*
-	if (key == 'a')
-	{
-		patcher.link(2, 7); // 1 -> 1
-	}
-	if (key == 's')
-	{
-		patcher.link(2, 10);
-	}
-	if (key == 'd')
-	{
-		patcher.link(5, 7);
-	}
-	*/
-
 	if (key == OF_KEY_F1)
 	{
 		ui.AddToLog(patcher.getListLinks());
@@ -642,4 +556,41 @@ void ofApp::keyPressedPatches(int key) {
 
 		ui.AddToLog(strInfo);
 	}
+}
+
+//--------------------------------------------------------------
+void ofApp::drawScene()
+{
+	ofBackground(128);
+
+	// Scene Widget
+	if (bScene)
+	{
+		int g = 300;
+		float r = ofMap(pTar1, 0, 1, 100, 500, true);
+		widget.setRadius(r);
+		widget.setColor(ofColor(color, ofMap(pTar0, 0, 1, 100, 255)));
+		float x = ofMap(pTar2, 0, 1, -g, g, true);
+		float y = ofMap(pTar3, 0, 1, -g, g, true);
+		ofPushMatrix();
+		ofTranslate(x, y);
+		widget.draw();
+		ofPopMatrix();
+	}
+
+	//--
+
+	// Help info
+	string str1 = "";
+	int w, h;
+	str1 += "RETURN       : PRINT CONNECTIONS\n";
+	str1 += "BACKSPACE    : DISCONNECT ALL\n";
+	str1 += "KEYS 1-2-3-4 : PATCHBAY LINKS PRESETS";
+	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str1);
+	ofxSurfingHelpers::drawTextBoxed(font, str1, 20, ofGetHeight() - h - 15);
+
+	// Patching Preset
+	w = ofxSurfingHelpers::getWidthBBtextBoxed(font, strInfo);
+	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, strInfo);
+	ofxSurfingHelpers::drawTextBoxed(font, strInfo, ofGetWidth() - w - 15, ofGetHeight() - h - 30);
 }
