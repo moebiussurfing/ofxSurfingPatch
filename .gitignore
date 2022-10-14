@@ -563,3 +563,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+examplePatch/enc_temp_folder/4311b6c6f321f69a1e753915cc4c7e83/ofxPatchbay.h
+examplePatch/enc_temp_folder/67d672209ac418e342e5785c8636242a/ofxPatchbayInput.cpp

@@ -31,7 +31,7 @@ public:
 	ofxSurfingGui ui;
 
 	ofParameter<bool> bGui{ "Gui",true };
-	ofParameter<bool> bGui_Patcher{ "thedmd",true };
+	ofParameter<bool> bGui_Patcher{ "SURFING PATCH",true };
 	ofParameter<bool> bScene{ "Scene",true };
 	ofParameter<bool> bGenerators{ "Generators",true };
 

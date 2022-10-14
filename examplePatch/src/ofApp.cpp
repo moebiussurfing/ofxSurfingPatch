@@ -10,9 +10,7 @@ void ofApp::setup()
 
 	setupPatches();
 
-	//--
-
-	// Callbacks
+	//TODO: workaround
 	setupCallbacks();
 }
 
@@ -52,13 +50,11 @@ void ofApp::setupParams() {
 	//--
 
 	// Scene Widget
-	{
-		widget.setEnableBorder(false);
-		widget.setDraggable(false);
-		widget.setToggleMode(true);
-		widget.toggle(true);
-		widget.setPosition(ofGetWidth() / 2, ofGetHeight() / 2);
-	}
+	widget.setEnableBorder(false);
+	widget.setDraggable(false);
+	widget.setToggleMode(true);
+	widget.toggle(true);
+	widget.setPosition(ofGetWidth() / 2, ofGetHeight() / 2);
 }
 
 //--------------------------------------------------------------
@@ -71,23 +67,26 @@ void ofApp::setupPatches() {
 	patchbay.addController(pSrc1);
 	patchbay.addController(pSrc2);
 	patchbay.addController(pSrc3);
-	//patchbay.addController(pSrc4b);
-	//patchbay.addController(pSrc5b);
+	patchbay.addController(pSrc4b);
+	patchbay.addController(pSrc5b);
 
 	// Define targets
 	patchbay.addTarget(pTar0);
 	patchbay.addTarget(pTar1);
 	patchbay.addTarget(pTar2);
 	patchbay.addTarget(pTar3);
+	patchbay.addTarget(pTar4b);
+	patchbay.addTarget(pTar5b);
 
 	// Setup to register
-	patchbay.setup();
+	patchbay.setupRegister();
 
 	//--
 
 	// Make some patching
 	// using the previously added 
 	// controllers and/to targets
+	/*
 	if (0)
 	{
 		// connect
@@ -102,6 +101,7 @@ void ofApp::setupPatches() {
 		strInfo += "2 -> 2\n";
 		strInfo += "3 -> 3\n";
 	}
+	*/
 }
 
 //--------------------------------------------------------------
@@ -275,8 +275,9 @@ void ofApp::update()
 {
 	if (ofGetFrameNum() == 10) startup();
 
-	updatePatches();
 	if (bGenerators) updateGenerators();
+
+	updatePatches();
 }
 
 //--------------------------------------------------------------
@@ -309,8 +310,6 @@ void ofApp::updateGenerators()
 void ofApp::draw()
 {
 	drawScene();
-
-	//--
 
 	drawGui();
 }
