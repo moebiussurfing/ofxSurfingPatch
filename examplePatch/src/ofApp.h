@@ -55,6 +55,7 @@ public:
 
 	//--
 
+	void setupParams();
 	void setupPatches();
 	void updatePatches();
 	void keyPressedPatches(int key);

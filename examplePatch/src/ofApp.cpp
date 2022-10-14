@@ -6,11 +6,7 @@ void ofApp::setup()
 	ofSetFrameRate(60);
 	ofSetWindowPosition(-1920, 25);
 
-	font.loadFont(FONT_PATH_DEFAULT_LEGACY, 10);
-
-	ofxSurfingHelpers::setThemeDark_ofxGui();
-
-	ui.setup();
+	setupParams();
 
 	setupPatches();
 
@@ -18,7 +14,94 @@ void ofApp::setup()
 
 	// Callbacks
 	setupCallbacks();
+}
 
+//--------------------------------------------------------------
+void ofApp::setupParams() {
+
+	font.loadFont(FONT_PATH_DEFAULT_LEGACY, 10);
+
+	ofxSurfingHelpers::setThemeDark_ofxGui();
+
+	ui.setup();
+
+	// Controllers
+	gControllers.add(pSrc0);
+	gControllers.add(pSrc1);
+	gControllers.add(pSrc2);
+	gControllers.add(pSrc3);
+	gControllers.add(pSrc4b);
+	gControllers.add(pSrc5b);
+
+	// Targets
+	gTargets.add(pTar0);
+	gTargets.add(pTar1);
+	gTargets.add(pTar2);
+	gTargets.add(pTar3);
+	gTargets.add(pTar4b);
+	gTargets.add(pTar5b);
+
+	//--
+
+	// Gui
+	guiSources.setup("SOURCES");
+	guiSources.add(gControllers);
+	guiTargets.setup("TARGETS");
+	guiTargets.add(gTargets);
+
+	//--
+
+	// Scene Widget
+	{
+		widget.setEnableBorder(false);
+		widget.setDraggable(false);
+		widget.setToggleMode(true);
+		widget.toggle(true);
+		widget.setPosition(ofGetWidth() / 2, ofGetHeight() / 2);
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::setupPatches() {
+
+	//--
+
+	// Define controllers
+	patchbay.addController(pSrc0);
+	patchbay.addController(pSrc1);
+	patchbay.addController(pSrc2);
+	patchbay.addController(pSrc3);
+	//patchbay.addController(pSrc4b);
+	//patchbay.addController(pSrc5b);
+
+	// Define targets
+	patchbay.addTarget(pTar0);
+	patchbay.addTarget(pTar1);
+	patchbay.addTarget(pTar2);
+	patchbay.addTarget(pTar3);
+
+	// Setup to register
+	patchbay.setup();
+
+	//--
+
+	// Make some patching
+	// using the previously added 
+	// controllers and/to targets
+	if (0)
+	{
+		// connect
+		patchbay.link(0, 0);
+		patchbay.link(1, 1);
+		patchbay.link(2, 2);
+		patchbay.link(3, 3);
+
+		strInfo = "PRESET \n";
+		strInfo += "0 -> 0\n";
+		strInfo += "1 -> 1\n";
+		strInfo += "2 -> 2\n";
+		strInfo += "3 -> 3\n";
+	}
 }
 
 //--------------------------------------------------------------
@@ -315,82 +398,6 @@ void ofApp::exit()
 	patcher.OnExit();
 
 	save(path);
-}
-
-//--------------------------------------------------------------
-void ofApp::setupPatches() {
-
-	// controllers
-	gControllers.add(pSrc0);
-	gControllers.add(pSrc1);
-	gControllers.add(pSrc2);
-	gControllers.add(pSrc3);
-	gControllers.add(pSrc4b);
-	gControllers.add(pSrc5b);
-
-	// targets
-	gTargets.add(pTar0);
-	gTargets.add(pTar1);
-	gTargets.add(pTar2);
-	gTargets.add(pTar3);
-	gTargets.add(pTar4b);
-	gTargets.add(pTar5b);
-
-	//--
-
-	// define controllers
-	patchbay.addController(pSrc0);
-	patchbay.addController(pSrc1);
-	patchbay.addController(pSrc2);
-	patchbay.addController(pSrc3);
-	//patchbay.addController(pSrc4b);
-	//patchbay.addController(pSrc5b);
-
-	// define targets
-	patchbay.addTarget(pTar0);
-	patchbay.addTarget(pTar1);
-	patchbay.addTarget(pTar2);
-	patchbay.addTarget(pTar3);
-
-	// register
-	patchbay.setupParameters();
-
-	//--
-
-	// make some patching
-	if (0)
-	{
-		// connect
-		patchbay.link(0, 0);
-		patchbay.link(1, 1);
-		patchbay.link(2, 2);
-		patchbay.link(3, 3);
-
-		strInfo = "PRESET \n";
-		strInfo += "0 -> 0\n";
-		strInfo += "1 -> 1\n";
-		strInfo += "2 -> 2\n";
-		strInfo += "3 -> 3\n";
-	}
-
-	//--
-
-	// gui
-	guiSources.setup("SOURCES");
-	guiSources.add(gControllers);
-	guiTargets.setup("TARGETS");
-	guiTargets.add(gTargets);
-
-	//--
-
-	// Scene Widget
-	{
-		widget.setEnableBorder(false);
-		widget.setDraggable(false);
-		widget.setToggleMode(true);
-		widget.toggle(true);
-		widget.setPosition(ofGetWidth() / 2, ofGetHeight() / 2);
-	}
 }
 
 //--------------------------------------------------------------
