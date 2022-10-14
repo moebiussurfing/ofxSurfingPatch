@@ -379,7 +379,6 @@ void ofApp::setupPatches() {
 	{
 		// connect
 		patchbay.link(0, 0);
-
 		patchbay.link(1, 1);
 		patchbay.link(2, 2);
 		patchbay.link(3, 3);
