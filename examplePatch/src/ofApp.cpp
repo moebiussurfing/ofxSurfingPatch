@@ -77,12 +77,12 @@ void ofApp::setupCallbacks()
 		});
 
 	//--
-	
+
 	//TODO: WIP notice that only one link can be deleted at time,
 	//or jsno will be broken...
-	 
+
 	// REMOVE LINK
-	
+
 	listener_RemovedLink = patcher.bRemovedLink.newListener([this](bool b)
 		{
 			if (b) {
@@ -291,6 +291,14 @@ void ofApp::drawPatcher()
 	}
 	*/
 
+	if (bGui_Patcher) {
+		ImGuiCond cond = ImGuiCond_Always;
+		ImVec2 sz(600, 300);
+		ImVec2 pos(ofGetWidth() / 2 - sz.x / 2, 10);
+		ImGui::SetNextWindowPos(pos, cond);
+		ImGui::SetNextWindowSize(sz, cond);
+	}
+
 	ImGuiWindowFlags window_flags;
 	window_flags = ImGuiWindowFlags_None;
 	if (ui.BeginWindow(bGui_Patcher, window_flags))
@@ -341,6 +349,8 @@ void ofApp::setupPatches() {
 	gTargets.add(pTar1);
 	gTargets.add(pTar2);
 	gTargets.add(pTar3);
+
+	//--
 
 	// define controllers
 	patchbay.addController(pSrc0);
@@ -393,13 +403,13 @@ void ofApp::setupPatches() {
 
 	//--
 
-	// widget
+	// Scene Widget
 	{
-		//widget.setName("Patcher");
 		widget.setEnableBorder(false);
 		widget.setDraggable(false);
 		widget.setToggleMode(true);
 		widget.toggle(true);
+		widget.setPosition(ofGetWidth() / 2, ofGetHeight() / 2);
 	}
 }
 
@@ -408,19 +418,19 @@ void ofApp::drawScene()
 {
 	ofBackground(128);
 
-	// draw scene
+	// Scene Widget
 	if (bScene)
 	{
-		widget.setColor(ofColor(color, ofMap(pTar0, 0, 1, 100, 255)));
+		int g = 300;
 		float r = ofMap(pTar1, 0, 1, 100, 500, true);
 		widget.setRadius(r);
-		float x = ofMap(pTar2, 0, 1, 0, ofGetWidth(), true);
-		float y = ofMap(pTar3, 0, 1, 0, ofGetHeight(), true);
-		int gap = r + 5;
-		x = ofClamp(x, gap, ofGetWidth() - gap);
-		y = ofClamp(y, gap, ofGetHeight() - gap);
-		widget.setPosition(x, y);
+		widget.setColor(ofColor(color, ofMap(pTar0, 0, 1, 100, 255)));
+		float x = ofMap(pTar2, 0, 1, -g, g, true);
+		float y = ofMap(pTar3, 0, 1, -g, g, true);
+		ofPushMatrix();
+		ofTranslate(x, y);
 		widget.draw();
+		ofPopMatrix();
 	}
 
 	//--
@@ -481,7 +491,7 @@ void ofApp::keyPressedPatches(int key) {
 	if (key == OF_KEY_RETURN) {
 		patchbay.printConnections();
 
-		ui.AddToLog(patchbay.getConnections());
+		//ui.AddToLog(patchbay.getConnections());
 	}
 
 	// Disconnect all
