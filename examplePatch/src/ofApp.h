@@ -18,7 +18,7 @@
 */
 
 
-class ofApp : public ofBaseApp 
+class ofApp : public ofBaseApp
 {
 
 public:
@@ -31,7 +31,7 @@ public:
 	void draw();
 	void exit();
 	void keyPressed(int key);
-	
+
 	void drawGui();
 	void drawImGui();
 
@@ -42,12 +42,12 @@ public:
 	ofParameter<bool> bScene{ "Scene",true };
 	ofParameter<bool> bGenerators{ "Generators",true };
 
-	void Changed_Params(ofAbstractParameter &e);
+	void Changed_Params(ofAbstractParameter& e);
 	ofParameterGroup params{ "Params" };
-	
+
 	void drawScene();
 	CircleBeat widget;
-	
+
 	NodePatcher patcher;
 
 	void drawPatcher();
@@ -58,7 +58,7 @@ public:
 	ofEventListener listener_RemovedLink;
 
 	//--
-	
+
 	void setupPatches();
 	void updatePatches();
 	void keyPressedPatches(int key);
@@ -71,6 +71,8 @@ public:
 	ofParameter<float>pSrc1{ "pSrc1", 0, 0, 1 };
 	ofParameter<float>pSrc2{ "pSrc2", 0, 0, 1 };
 	ofParameter<float>pSrc3{ "pSrc3", 0, 0, 1 };
+	ofParameter<bool>pSrc4b{ "pSrc4", false };
+	ofParameter<bool>pSrc5b{ "pSrc5", false };
 	ofParameterGroup gControllers{ "gSources" };
 
 	// Targets
@@ -78,6 +80,8 @@ public:
 	ofParameter<float>pTar1{ "pTar1", 0, 0, 1 };
 	ofParameter<float>pTar2{ "pTar2", 0, 0, 1 };
 	ofParameter<float>pTar3{ "pTar3", 0, 0, 1 };
+	ofParameter<bool>pTar4b{ "pTar4", false };
+	ofParameter<bool>pTar5b{ "pTar5", false };
 	ofParameterGroup gTargets{ "gTargets" };
 
 	// Gui

@@ -292,7 +292,7 @@ void ofApp::drawPatcher()
 	*/
 
 	if (bGui_Patcher) {
-		ImGuiCond cond = ImGuiCond_Always;
+		ImGuiCond cond = ImGuiCond_FirstUseEver;
 		ImVec2 sz(600, 300);
 		ImVec2 pos(ofGetWidth() / 2 - sz.x / 2, 10);
 		ImGui::SetNextWindowPos(pos, cond);
@@ -343,12 +343,16 @@ void ofApp::setupPatches() {
 	gControllers.add(pSrc1);
 	gControllers.add(pSrc2);
 	gControllers.add(pSrc3);
+	gControllers.add(pSrc4b);
+	gControllers.add(pSrc5b);
 
 	// targets
 	gTargets.add(pTar0);
 	gTargets.add(pTar1);
 	gTargets.add(pTar2);
 	gTargets.add(pTar3);
+	gTargets.add(pTar4b);
+	gTargets.add(pTar5b);
 
 	//--
 
@@ -357,6 +361,8 @@ void ofApp::setupPatches() {
 	patchbay.addController(pSrc1);
 	patchbay.addController(pSrc2);
 	patchbay.addController(pSrc3);
+	//patchbay.addController(pSrc4b);
+	//patchbay.addController(pSrc5b);
 
 	// define targets
 	patchbay.addTarget(pTar0);
@@ -368,6 +374,7 @@ void ofApp::setupPatches() {
 
 	//--
 
+	// make some patching
 	if (0)
 	{
 		// connect
@@ -394,10 +401,10 @@ void ofApp::setupPatches() {
 
 	//--
 
+	// callbacks
+
 	params.add(gControllers);
 	//params.add(gTargets);
-
-	//--
 
 	ofAddListener(params.parameterChangedE(), this, &ofApp::Changed_Params);
 
