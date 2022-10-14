@@ -268,6 +268,8 @@ void ofApp::save(string path)
 	ofSavePrettyJson(path, js);
 }
 
+//--
+
 //--------------------------------------------------------------
 void ofApp::update()
 {
@@ -299,6 +301,18 @@ void ofApp::updateGenerators()
 	pSrc1 = ofxSurfingHelpers::Bounce(3.0f);
 	pSrc2 = ofxSurfingHelpers::Noise(ofPoint(2, -1));
 	pSrc3 = ofxSurfingHelpers::Bounce(0.5f);
+}
+
+//--
+
+//--------------------------------------------------------------
+void ofApp::draw()
+{
+	drawScene();
+
+	//--
+
+	drawGui();
 }
 
 //--------------------------------------------------------------
@@ -341,23 +355,13 @@ void ofApp::drawImGui()
 			}
 		}
 
-		drawPatcher();
+		drawPatches();
 	}
 	ui.End();
 }
 
 //--------------------------------------------------------------
-void ofApp::draw()
-{
-	drawScene();
-
-	//--
-
-	drawGui();
-}
-
-//--------------------------------------------------------------
-void ofApp::drawPatcher()
+void ofApp::drawPatches()
 {
 	if (!bGui_Patcher) return;
 
@@ -391,6 +395,8 @@ void ofApp::drawPatcher()
 		ui.EndWindow();
 	}
 }
+
+//--
 
 //--------------------------------------------------------------
 void ofApp::exit()
@@ -592,7 +598,7 @@ void ofApp::drawScene()
 	int w, h;
 	str1 += "RETURN       : PRINT CONNECTIONS\n";
 	str1 += "BACKSPACE    : DISCONNECT ALL\n";
-	str1 += "KEYS 1-2-3-4 : PATCHBAY LINKS PRESETS";
+	str1 += "KEYS 1-2-3-4 : PRESETS";
 	h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str1);
 	ofxSurfingHelpers::drawTextBoxed(font, str1, 20, ofGetHeight() - h - 15);
 

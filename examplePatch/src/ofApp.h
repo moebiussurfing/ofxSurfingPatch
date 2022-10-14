@@ -10,13 +10,6 @@
 #include "ofxSurfing_ofxGui.h"	
 #include "CircleBeat.h"
 
-/*
-	+ add pins sources/params during runtime
-	+ add wires during runtime
-	+ persistent data
-	+ presets
-*/
-
 class ofApp : public ofBaseApp
 {
 
@@ -29,6 +22,7 @@ public:
 	void exit();
 	void keyPressed(int key);
 
+	void setupParams();
 	void setupCallbacks();
 	void updateGenerators();
 	void drawGui();
@@ -44,24 +38,34 @@ public:
 	void drawScene();
 	CircleBeat widget;
 
+	//--
+
 	NodePatcher patcher;
 
-	void drawPatcher();
+	void setupPatches();
+	void updatePatches();
+	void drawPatches();
+	void keyPressedPatches(int key);
 
 	bool initialized = false;
 
 	ofEventListener listener_NewLink;
 	ofEventListener listener_RemovedLink;
 
-	//--
-
-	void setupParams();
-	void setupPatches();
-	void updatePatches();
-	void keyPressedPatches(int key);
-
 	// Params Patcher
 	ofxPatchbay patchbay;
+
+	//--
+
+	// Patching Serialization
+	string path = "patching.json";
+	ofJson js;
+	void load(string path);
+	void save(string path);
+	void linkToJson(int i, int o);
+	void unlinkFromJson(int i, int o);
+
+	//--
 
 	// Sources
 	ofParameter<float>pSrc0{ "pSrc0", 0, 0, 1 };
@@ -88,14 +92,5 @@ public:
 	// Scene
 	ofColor color = ofColor::white;
 	ofTrueTypeFont font;
-
 	string strInfo = "\nNO PRESET \n";
-
-	// Patching Serialization
-	string path = "patching.json";
-	ofJson js;
-	void load(string path);
-	void save(string path);
-	void linkToJson(int i, int o);
-	void unlinkFromJson(int i, int o);
 };
