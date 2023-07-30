@@ -2,9 +2,9 @@
 
 #include "ofMain.h"
 
+# define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 # include <imgui_node_editor.h>
-# define IMGUI_DEFINE_MATH_OPERATORS
 # include <imgui_internal.h>
 
 namespace ed = ax::NodeEditor;
@@ -38,6 +38,7 @@ static int g_NextLinkId = 100;
 
 //--
 
+//--------------------------------------------------------------
 class NodePatcher
 {
 public:
@@ -54,6 +55,7 @@ public:
 
 	//--
 
+	//--------------------------------------------------------------
 	void link(int i, int o)
 	{
 		// Since we accepted new link, lets add one to our list of links.
@@ -67,6 +69,7 @@ public:
 	//--
 
 	/*
+	//--------------------------------------------------------------
 	void link(int i, int o)
 	{
 		ax::NodeEditor::QueryNewLink(PinId * startId, PinId * endId);
@@ -85,6 +88,7 @@ public:
 
 	//--
 
+	//--------------------------------------------------------------
 	void clearLinks()
 	{
 		g_Links.clear();
@@ -121,6 +125,7 @@ public:
 
 	//--
 
+	//--------------------------------------------------------------
 	void OnSetup()
 	{
 		ed::Config config;
@@ -146,6 +151,7 @@ public:
 
 	//--
 
+	//--------------------------------------------------------------
 	void OnExit()
 	{
 		ed::DestroyEditor(g_Context);
@@ -174,6 +180,7 @@ public:
 
 	//--
 
+	//--------------------------------------------------------------
 	void OnDraw()
 	{
 		ed::SetCurrentEditor(g_Context);

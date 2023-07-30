@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "ofMain.h"
+
 #include "NodePatcher.h"
+#include "NodeManager.h"
 
 class ofxSurfingPatch : public ofBaseApp
 {
