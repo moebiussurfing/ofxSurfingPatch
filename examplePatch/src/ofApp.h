@@ -9,6 +9,7 @@
 #include "ofxGui.h"
 #include "ofxSurfing_ofxGui.h"	
 #include "CircleBeat.h"
+#include "ofxSurfing_Widgets.h"
 
 class ofApp : public ofBaseApp
 {
